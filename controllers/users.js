@@ -38,7 +38,7 @@ const updateUserProfile = ((req, res) => {
     { name, about },
     { new: true, runValidators: true },
   ).orFail(new Error('NotFound'))
-    .then((user) => { res.send({ user }); })
+    .then((user) => { res.send(user); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return res.status(400).send({ message: 'Переданы невалидные данные' }); }
       if (err.message === 'NotFound') { return res.status(404).send({ message: 'Пользователь с указанным _id не найден' }); }
@@ -49,7 +49,7 @@ const updateUserProfile = ((req, res) => {
 const patchUserAvatar = ((req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }).orFail(new Error('NotFound'))
-    .then((avatsrUpdated) => { res.send({ avatsrUpdated }); })
+    .then((avatsrUpdated) => { res.send(avatsrUpdated); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return res.status(400).send({ message: 'Переданы невалидные данные' }); }
       if (err.message === 'NotFound') { return res.status(404).send({ message: 'Пользователь с указанным _id не найден' }); }
