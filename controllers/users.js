@@ -20,11 +20,11 @@ const getUsers = (req, res) => {
 };
 
 const getUsersById = (req, res) => {
-  User.findById(req.user._id).orFail(new Error('NotFound'))
+  User.findById(req.params.id).orFail(new Error('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status.send({ message: 'Не корректный id' });
+        return res.status(400).send({ message: 'Не корректный id' });
       }
       if (err.message === 'NotFound') { return res.status(404).send({ message: 'Пользователь с таким _id не найден' }); }
       return res.status(500).send({ message: 'Ошибка по умолчанию.' });

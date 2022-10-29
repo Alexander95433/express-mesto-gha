@@ -27,6 +27,7 @@ const deleteCard = (req, res) => {
       res.send({ card, message: 'Карточка успешно удалена' });
     })
     .catch((err) => {
+      if (err.name === 'CastError') { return res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' }); }
       if (err.message === 'NotFound') { return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }); }
       return res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
