@@ -7,5 +7,3 @@ const defaultUserId = (req, res, next) => {
 };
 
 module.exports = { defaultUserId };
-
-//const { defaultUserId } = require('./middleware/index');
