@@ -11,8 +11,9 @@ app.use(express.json());
 
 mongoose.connect(MONGO_URL, { autoIndex: true });
 
-app.use('/users', defaultUserId, usersRouter);
-app.use('/cards', defaultUserId, cardsRouter);
+app.use(defaultUserId);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 app.use('*', (req, res) => { res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }); });
 
 app.listen(PORT, () => {
