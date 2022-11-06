@@ -1,9 +1,19 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const BadRequestError = require('bad-request-error');
 const User = require('../models/user');
 
 const createUsers = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  if (!email || !password) {
+    return res.status(BadRequestError).send({ message: 'Поля email и password обязательны' });
+  }
+  return bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email: req.body.email, password: hash,
+    }))
     .then((user) => { res.status(201).send(user); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {

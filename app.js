@@ -12,7 +12,7 @@ mongoose.connect(MONGO_URL, { autoIndex: true });
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '6345a04ed7c49939ecff812a',
+    _id: '6366f959ee730e4c89ca6757',
   };
 
   next();

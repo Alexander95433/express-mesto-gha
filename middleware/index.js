@@ -1,6 +1,6 @@
 const defaultUserId = (req, res, next) => {
   req.user = {
-    _id: '635a8420b964a6cc96fdcfe4',
+    _id: '6366f959ee730e4c89ca6757',
   };
 
   next();
