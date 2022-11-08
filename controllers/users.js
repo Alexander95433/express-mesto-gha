@@ -1,7 +1,21 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const BadRequestError = require('bad-request-error');
 const User = require('../models/user');
+
+const login = ((req, res, next) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+  //отпавка куки
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+      res.send(token);
+    })
+    .catch((err) => { next(res.status(401).send({ message: err.message })); });
+});
 
 const createUsers = (req, res) => {
   const {
@@ -71,5 +85,5 @@ const patchUserAvatar = ((req, res) => {
 });
 
 module.exports = {
-  createUsers, getUsers, getUsersById, updateUserProfile, patchUserAvatar,
+  createUsers, getUsers, getUsersById, updateUserProfile, patchUserAvatar, login,
 };
