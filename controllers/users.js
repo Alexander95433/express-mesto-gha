@@ -8,11 +8,10 @@ const User = require('../models/user');
 const login = ((req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
-  //отпавка куки
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
-      res.send(token);
+      res.send({ token });
     })
     .catch((err) => { next(res.status(401).send({ message: err.message })); });
 });
@@ -36,6 +35,17 @@ const createUsers = (req, res) => {
       return res.status(500).send({ message: 'Ошибка по умолчанию.' });
     });
 };
+
+const getUser = ((req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      return res.send(user);
+    })
+    .catch(() => { res.status(500).send({ message: 'Ошибка по умолчанию.' }); });
+});
 
 const getUsers = (req, res) => {
   User.find({})
@@ -85,5 +95,5 @@ const patchUserAvatar = ((req, res) => {
 });
 
 module.exports = {
-  createUsers, getUsers, getUsersById, updateUserProfile, patchUserAvatar, login,
+  createUsers, getUsers, getUsersById, updateUserProfile, patchUserAvatar, login, getUser,
 };

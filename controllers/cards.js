@@ -22,8 +22,14 @@ const getCards = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId).orFail(new Error('NotFound'))
-    .then((card) => { res.send(card); })
+  Card.findById(req.params.cardId).orFail(new Error('NotFound'))
+    .then((cards) => {
+      if (!cards.owner.equals(req.user._id)) {
+        return res.status(404).send({ message: 'Попытка удалить чужую карточку' });
+      }
+      return Card.findByIdAndRemove(req.params.cardId)
+        .then((removeCard) => { res.send(removeCard); });
+    })
     .catch((err) => {
       if (err.name === 'CastError') { return res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' }); }
       if (err.message === 'NotFound') { return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }); }

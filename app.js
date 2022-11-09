@@ -1,26 +1,34 @@
 const express = require('express');
+// const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const auth = require('./middleware/auth');
+const { login, createUsers } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
+
 const app = express();
+
+// app.use(cookieParser());
 
 app.use(express.json());
 
 mongoose.connect(MONGO_URL, { autoIndex: true });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6366f959ee730e4c89ca6757',
-  };
+app.post('/signin', login);
 
-  next();
-});
+app.post('/signup', createUsers);
+
+app.use(auth);
+
 app.use('/users', usersRouter);
+
 app.use('/cards', cardsRouter);
+
 app.use('*', (req, res) => { res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }); });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Порт ${PORT}`);
 });
