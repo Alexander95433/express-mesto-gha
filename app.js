@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 
-const router = require('express').Router();
+// const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 const auth = require('./middleware/auth');
