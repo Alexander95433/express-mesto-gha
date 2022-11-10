@@ -1,14 +1,14 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
+// const { celebrate, Joi } = require('celebrate');
+// const validator = require('validator');
 const { errors } = require('celebrate');
 
-const auth = require('./middleware/auth');
-const { login, createUsers } = require('./controllers/users');
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
+// const auth = require('./middleware/auth');
+// const { login, createUsers } = require('./controllers/users');
+// const usersRouter = require('./routes/users');
+// const cardsRouter = require('./routes/cards');
 const cenralErrors = require('./middleware/centralError');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
@@ -21,43 +21,45 @@ app.use(express.json());
 
 mongoose.connect(MONGO_URL, { autoIndex: true });
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().custom((value, helpers) => {
-      if (validator.isEmail(value)) { return value; }
-      return helpers.message('Некорректный email');
-    }),
-    password: Joi.string().required(),
-  }),
-}), login);
+const routers = require('./routes/index');
 
-app.post('/signup', (celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom((value, helpers) => {
-      if (/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/.test(value)) {
-        return value;
-      }
-      return helpers.message('Некорректная ссылка');
-    }),
-    email: Joi.string().required().custom((value, helpers) => {
-      if (validator.isEmail(value)) {
-        return value;
-      }
-      return helpers.message('Некорректный email');
-    }),
-    password: Joi.string().required(),
-  }),
-})), createUsers);
+app.use(routers);
 
-app.use(auth);
+// app.post('/signin', celebrate({
+//   body: Joi.object().keys({
+//     email: Joi.string().required().custom((value, helpers) => {
+//       if (validator.isEmail(value)) { return value; }
+//       return helpers.message('Некорректный email');
+//     }),
+//     password: Joi.string().required(),
+//   }),
+// }), login);
 
-app.use('/users', usersRouter);
+// app.post('/signup', (celebrate({
+//   body: Joi.object().keys({
+//     name: Joi.string().min(2).max(30),
+//     about: Joi.string().min(2).max(30),
+//     avatar: Joi.string().custom((value, helpers) => {
+//       if (/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/.test(value)) {
+//         return value;
+//       }
+//       return helpers.message('Некорректная ссылка');
+//     }),
+//     email: Joi.string().required().custom((value, helpers) => {
+//       if (validator.isEmail(value)) {
+//         return value;
+//       }
+//       return helpers.message('Некорректный email');
+//     }),
+//     password: Joi.string().required(),
+//   }),
+// })), createUsers);
 
-app.use('/cards', cardsRouter);
+// app.use(auth);
 
-app.use('*', (req, res) => { res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }); });
+// app.use('/users', usersRouter);
+
+// app.use('/cards', cardsRouter);
 
 //
 app.use(errors());
