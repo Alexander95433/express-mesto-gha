@@ -5,6 +5,7 @@ const auth = require('./middleware/auth');
 const { login, createUsers } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const cenralErrors = require('./middleware/centralError');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
@@ -27,6 +28,8 @@ app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
 app.use('*', (req, res) => { res.status(404).send({ message: 'Запрашиваемый ресурс не найден' }); });
+
+app.use(cenralErrors);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

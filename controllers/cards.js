@@ -1,59 +1,62 @@
 const mongoose = require('mongoose');
+
+const BadRequestError = require('../errors/BadRequestError');
+const ErrorNotFound = require('../errors/ErrorNotFound');
+const CardDeletionError = require('../errors/CardDeletionError');
+
 const Card = require('../models/card');
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => { res.status(201).send({ card }); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
+        return next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       }
-      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+      return next(err);
     });
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => { res.send(cards); })
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
-    });
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId).orFail(new Error('NotFound'))
     .then((cards) => {
       if (!cards.owner.equals(req.user._id)) {
-        return res.status(404).send({ message: 'Попытка удалить чужую карточку' });
+        return next(new CardDeletionError('Попытка удалить чужую карточку'));
       }
       return Card.findByIdAndRemove(req.params.cardId)
         .then((removeCard) => { res.send(removeCard); });
     })
     .catch((err) => {
-      if (err.name === 'CastError') { return res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' }); }
-      if (err.message === 'NotFound') { return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' }); }
-      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+      if (err.name === 'CastError') { return next(new BadRequestError('Переданы некорректные данные при удалении карточки')); }
+      if (err.message === 'NotFound') { return next(new ErrorNotFound('Карточка с указанным _id не найдена')); }
+      return next(err);
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true }).orFail(new Error('NotFound'))
     .then((like) => { res.send(like); })
     .catch((err) => {
-      if (err.name === 'CastError') { return res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' }); }
-      if (err.message === 'NotFound') { return res.status(404).send({ message: 'Передан несуществующий _id карточки' }); }
-      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+      if (err.name === 'CastError') { return next(new BadRequestError('Не удалось поставить like. Переданы не корректные данные')); }
+      if (err.message === 'NotFound') { return next(new ErrorNotFound('Передан несуществующий _id карточки')); }
+      return next(err);
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true }).orFail(new Error('NotFound'))
     .then((like) => { res.send(like); })
     .catch((err) => {
-      if (err.name === 'CastError') { return res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' }); }
-      if (err.message === 'NotFound') { return res.status(404).send({ message: 'Передан несуществующий _id карточки' }); }
-      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+      if (err.name === 'CastError') { return next(new BadRequestError('Не удалось удалить like. Переданы не корректные данные')); }
+      if (err.message === 'NotFound') { return next(new ErrorNotFound('Передан несуществующий _id карточки')); }
+      return next(err);
     });
 };
 
