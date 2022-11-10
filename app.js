@@ -5,13 +5,11 @@ const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 const { errors } = require('celebrate');
 
-// const router = require('express').Router();
 const auth = require('./middleware/auth');
 const { login, createUsers } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const cenralErrors = require('./middleware/centralError');
-// const ErrorNotFound = require('./errors/ErrorNotFound');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 

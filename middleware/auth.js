@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
   const token = req.cookies.jwt;
   let payload;
   try { payload = jwt.verify(token, 'some-secret-key'); } catch (err) {
-    return new BadAuthError('Необходима авторизация');
+    return next(new BadAuthError('Необходима авторизация'));
   }
   req.user = payload;
   return next();
