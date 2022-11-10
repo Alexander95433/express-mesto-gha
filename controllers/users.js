@@ -59,11 +59,11 @@ const getUsers = (req, res, next) => {
 };
 
 const getUsersById = (req, res, next) => {
-  User.findById(req.params.id).orFail(new Error('NotFound'))
+  User.findById(req.params.id).orFail(() => { next(new ErrorNotFound('пользователь с таким id не найден')); })
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) { return next(new BadRequestError('Переданы невалидные данные')); }
       if (err instanceof mongoose.Error.CastError) { return next(new BadRequestError('Не корректный id')); }
-      if (err.message === 'NotFound') { return next(new ErrorNotFound('Пользователь с таким _id не найден')); }
       return next(err);
     });
 };
