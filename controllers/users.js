@@ -34,7 +34,7 @@ const createUsers = (req, res, next) => {
     .then((user) => { res.status(201).send(user); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return next(new BadRequestError('Переданы невалидные данные')); }
-      if (err.code === 11000) { return next(new EmailErrorAlreadyExists('Пользователь с таким email уже зарегистрирован')); }
+      if (err.code === 11000) { return next(new EmailErrorAlreadyExists(err.message)); }
       return next(err);
     });
 };
