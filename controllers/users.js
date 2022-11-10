@@ -60,7 +60,13 @@ const getUsers = (req, res, next) => {
 
 const getUsersById = (req, res, next) => {
   User.findById(req.params.userId).orFail(() => { next(new ErrorNotFound('пользователь с таким id не найден')); })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (user) {
+        res.send(user);
+      } else {
+        throw (new ErrorNotFound('пользователь с таким id не найден'));
+      }
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) { return next(new BadRequestError('Не корректный id')); }
       return next(err);
