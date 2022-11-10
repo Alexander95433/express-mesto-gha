@@ -68,11 +68,10 @@ const updateUserProfile = ((req, res, next) => {
     req.user._id,
     { name, about },
     { new: true, runValidators: true },
-  ).orFail(new Error('NotFound'))
-    .then((user) => { res.send(user); })
+  ).orFail(() => new ErrorNotFound('Пользователь с указанным id не существует'))
+    .then((user) => { res.send({ data: user }); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return next(new BadRequestError('Переданы невалидные данные')); }
-      if (err.message === 'NotFound') { return next(new ErrorNotFound('Пользователь с указанным _id не найден')); }
       return next(err);
     });
 });
@@ -82,11 +81,10 @@ const patchUserAvatar = ((req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
-  }).orFail(new Error('NotFound'))
+  }).orFail(() => new ErrorNotFound('Пользователь с указанным id не существует'))
     .then((avatsrUpdated) => { res.send(avatsrUpdated); })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return next(new BadRequestError('Переданы невалидные данные')); }
-      if (err.message === 'NotFound') { return next(new ErrorNotFound('Пользователь с указанным _id не найден')); }
       return next(err);
     });
 });
