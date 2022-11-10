@@ -62,6 +62,9 @@ const dislikeCard = (req, res, next) => {
       res.send(like);
     })
     .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return next(new BadRequestError('Переданы некорректные данные при удаление лайка'));
+      }
       if (err.name === 'CastError') { return next(new BadRequestError('Не удалось удалить like. Переданы не корректные данные')); }
       if (err.message === 'NotFound') { return next(new ErrorNotFound('Передан несуществующий _id карточки')); }
       return next(err);
