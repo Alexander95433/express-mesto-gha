@@ -31,7 +31,11 @@ const createUsers = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email: req.body.email, password: hash,
     }))
-    .then((user) => { res.status(201).send({ user, password: user.password }); })
+    .then((user) => {
+      res.status(201).send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      });
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) { return next(new BadRequestError('Переданы невалидные данные')); }
       if (err.code === 11000) { return next(new EmailErrorAlreadyExists(err.message)); }
