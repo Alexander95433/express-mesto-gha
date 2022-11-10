@@ -21,12 +21,7 @@ const login = ((req, res, next) => {
 });
 
 const createUsers = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  if (!email || !password) {
-    return next(new BadRequestError('Поля email и password обязательны'));
-  }
+  const { name, about, avatar } = req.body;
   return bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name, about, avatar, email: req.body.email, password: hash,
@@ -60,13 +55,7 @@ const getUsers = (req, res, next) => {
 
 const getUsersById = (req, res, next) => {
   User.findById(req.params.id).orFail(() => { next(new ErrorNotFound('пользователь с таким id не найден')); })
-    .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        throw (new ErrorNotFound('пользователь с таким id не найден'));
-      }
-    })
+    .then((user) => { if (user) { res.send(user); } })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) { return next(new BadRequestError('Не корректный id')); }
       return next(err);
