@@ -59,7 +59,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getUsersById = (req, res, next) => {
-  User.findById(req.params.userId).orFail(() => { next(new ErrorNotFound('пользователь с таким id не найден')); })
+  User.findById(req.params.Id).orFail(() => { next(new ErrorNotFound('пользователь с таким id не найден')); })
     .then((user) => {
       if (user) {
         res.send(user);
