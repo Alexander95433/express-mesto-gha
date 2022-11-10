@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 const { errors } = require('celebrate');
 const auth = require('./middleware/auth');
 const { login, createUsers } = require('./controllers/users');
@@ -27,8 +28,18 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().min(2),
-    email: Joi.string().required().email(),
+    avatar: Joi.string().custom((value, helpers) => {
+      if (/^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/.test(value)) {
+        return value;
+      }
+      return helpers.message('Некорректная ссылка');
+    }),
+    email: Joi.string().required().custom((value, helpers) => {
+      if (validator.isEmail(value)) {
+        return value;
+      }
+      return helpers.message('Некорректный email');
+    }),
     password: Joi.string().required(),
   }),
 }), createUsers);
