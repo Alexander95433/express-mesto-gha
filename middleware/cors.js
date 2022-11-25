@@ -11,7 +11,11 @@
 //   credentials: true,
 // };
 
-const allowlist = ['https://alex-mesto.nomoredomains.icu'];
+const allowlist = [
+  'https://alex-mesto.nomoredomains.icu',
+  'http://alex-mesto.nomoredomains.icu',
+  'http://localhost:3000',
+];
 module.exports.corsOptionsDelegate = (req, callback) => {
   let corsOptions;
   if (allowlist.indexOf(req.header('Origin')) !== -1) {
