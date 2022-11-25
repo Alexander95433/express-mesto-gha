@@ -23,19 +23,19 @@ app.use(requestLogger);
 
 // app.use('*', cors(corsConfiguration));
 
-//app.use(cors(corsOptionsDelegate));
+app.use(cors(corsOptionsDelegate));
 
-const allowlist = ['https://alex-mesto.nomoredomains.icu']
-const corsOptions = (req, callback) => {
-  let corsOptions;
-  if (allowlist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true, credentials: true } // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
-}
-app.use(cors(corsOptions));
+// const allowlist = ['https://alex-mesto.nomoredomains.icu'];
+// const corsOptions = (req, callback) => {
+//   let corsOptions;
+//   if (allowlist.indexOf(req.header('Origin')) !== -1) {
+//     corsOptions = { origin: true, credentials: true };
+//   } else {
+//     corsOptions = { origin: false };
+//   }
+//   callback(null, corsOptions);
+// };
+// app.use(cors(corsOptions));
 
 app.get('/crash-test', () => {
   setTimeout(() => {
