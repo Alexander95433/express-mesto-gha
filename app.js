@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { errors } = require('celebrate');
-const corsConfiguration = require('./middleware/cors');
+// const corsConfiguration = require('./middleware/cors');
+const corsOptionsDelegate = require('./middleware/cors');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const cenralErrors = require('./middleware/centralError');
 const routers = require('./routes/index');
@@ -20,7 +21,9 @@ mongoose.connect(MONGO_URL, { autoIndex: true });
 
 app.use(requestLogger);
 
-app.use('*', cors(corsConfiguration));
+// app.use('*', cors(corsConfiguration));
+
+app.use(cors(corsOptionsDelegate));
 
 app.get('/crash-test', () => {
   setTimeout(() => {
