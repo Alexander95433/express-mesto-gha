@@ -7,6 +7,7 @@ module.exports = (req, res, next) => {
   //   return new BadAuthError('Необходима авторизация');
   // }
   // const token = authorization.replace('Bearer ', '');
+
   const token = req.cookies.jwt;
   let payload;
   try { payload = jwt.verify(token, 'some-secret-key'); } catch (err) {
